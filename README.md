@@ -4,9 +4,9 @@ This Node application does the following:
   - Makes a POST request to a "Named Entity Recognition API"  available at 139.162.230.113:8888.
   - Returns or prints the input message with the identified entities tagged 
   - Example : 
-  	Input : 
+  	- Input : 
 		I was born in Springfield and grew up in Boston.
-	Output : 		
+	- Output : 		
 		I was born in \<mark data-entity=”gpe”\>Springfield\</span\> and grew up in \<mark data-entity=”gpe”\>Boston\</span\>.
 
 
