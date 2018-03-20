@@ -52,13 +52,30 @@ var options = {
 // returns array containing tag_count and tagged_message
 
 function tag_message_with_entities(message,response) {
+	
+	// to hold the tag count
 	var count = 0;
+
+	// helper variables to do the tagging part
+	var replace_pattern;
+	var replaced_message;
+	var split_message;
+	var tagged_message = '';
+	var regx_split_pattern = "</span>" + '(.+)';
+	var split_condition = new RegExp(regx_split_pattern);
+
+
 	for(var i in response) {
-		var replace = '<mark data-entity="'+response[i].type+'">'+response[i].text+'</span>';
-		var message = message.replace(response[i].text, replace);
+		replace_pattern = '<mark data-entity="'+response[i].type+'">'+response[i].text+'</span>';
+		replaced_message =  message.replace(response[i].text, replace_pattern);
+		split_message = replaced_message.split(split_condition);
+		tagged_message = tagged_message + split_message[0] + '</span>';
+		message = split_message[1];
 		count = count + 1;
 	}
-	return [count,message];
+
+	tagged_message = tagged_message + message;
+	return [count,tagged_message];
 
 }
 
@@ -66,7 +83,12 @@ function tag_message_with_entities(message,response) {
 
 var response_handler = function(response) {
 
+	// to receive messaged
+	var str = '';
+
+	// to convert string response to JSON format for parsing
 	var json_response;
+
 
 	// Handle http error
 	response.on('error', function(err) {
@@ -75,14 +97,16 @@ var response_handler = function(response) {
 
 	// Receive the response
 	response.on('data', function(response_data) {
-		json_response = JSON.parse(response_data);
+		str = str + response_data; 
 	});
 
 
 	// Entire response has been received
 	// Tag the message with the identified entities
 	response.on('end', function() {
-		//console.log(json_response)
+		//console.log(str);
+		json_response = JSON.parse(str);
+		//console.log(json_response);
 		tagged_message = tag_message_with_entities(message,json_response);
 		if (process.argv.length <= 2) {
 			console.log('\nNo Input was given - Showing output for a default input message = "',message,'"')
